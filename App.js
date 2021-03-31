@@ -1,12 +1,23 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, Alert} from 'react-native';
+import {isEqual} from 'lodash';
 
 import {Block} from '@component';
+
+const equals = (a, b) => {
+  for (let i = 0; i < a.length; i++) {
+    console.log(`${a[i]}!==${b[i]}`);
+
+    return a[i] !== b[i];
+  }
+  return true;
+};
 
 const Home = () => {
   const [isCross, setCros] = useState(true);
   const [dataCross, setDataCross] = useState([]);
   const [dataCircle, setDataCircle] = useState([]);
+  const [winner, setWinner] = useState('');
 
   const awnser = [
     [1, 2, 3],
@@ -34,11 +45,44 @@ const Home = () => {
   };
 
   const togglePlayer = () => setCros(!isCross);
-  const check = () => {};
+  const check = () => {
+    awnser.forEach((e, i) => {
+      const x = isEqual(e.sort(), dataCross.sort());
+      if (x) {
+        setWinner('X');
+      }
+
+      const c = isEqual(e.sort(), dataCircle.sort());
+      if (c) {
+        setWinner('X');
+      }
+    });
+    // awnser.map((e, i) => {
+    //   const a = isEqual(e.sort(), [1, 2, 3].sort());
+    //   console.log(`a - ${i}`, a, e.sort());
+    // });
+  };
+
+  const resetData = () => {
+    setCros(true);
+    setDataCross([]);
+    setDataCircle([]);
+    setWinner();
+  };
 
   useEffect(() => {
     console.log({dataCircle, dataCross});
+    check();
   }, [dataCircle, dataCross]);
+
+  useEffect(() => {
+    if (winner) {
+      Alert.alert('winner', `winner is :${winner}`, [
+        {text: 'OK', onPress: () => resetData()},
+      ]);
+    }
+  }, [winner]);
+
   return (
     <View style={{flex: 1}}>
       <Text>Home</Text>
