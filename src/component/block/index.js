@@ -6,7 +6,7 @@ const Block = ({id, click, dataX, dataC}) => {
   const isX = dataX.includes(id);
   const isC = dataC.includes(id);
   const isDisable = isX || isC ? true : false;
-  console.log({dataX, dataC});
+  // console.log({dataX, dataC});
   return (
     <TouchableOpacity
       disabled={isDisable}
