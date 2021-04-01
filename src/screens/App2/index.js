@@ -5,9 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Touchable,
+  ActivityIndicator,
 } from 'react-native';
 
+const delay = (t = 2) =>
+  new Promise(resolve => setTimeout(() => resolve(), t * 1000));
 class App2 extends Component {
   state = {
     gameBox: [
@@ -16,6 +18,7 @@ class App2 extends Component {
       [0, 0, 0],
     ],
     player: 1,
+    aiLoading: false,
   };
 
   componentDidMount() {
@@ -71,7 +74,7 @@ class App2 extends Component {
       {gameBox: theBoxPosition, player: player === 1 ? 2 : 1},
       () => {
         const w = this.checkWinner();
-        console.log({w});
+        // console.log({w});
         if (w === 'full') {
           Alert.alert('Draw', 'permainan Seri', [
             {text: 'Mulai Lagi', onPress: () => this.resetGames()},
@@ -87,6 +90,21 @@ class App2 extends Component {
         }
       },
     );
+  };
+
+  shouldComponentUpdate(_nextProps, nextState) {
+    const {player} = nextState;
+    const {player: currentPlayer} = this.state;
+    // if (player === 2 && currentPlayer === 1) {
+    //   this.runAI();
+    // }
+    return nextState;
+  }
+
+  runAI = async () => {
+    this.setState({aiLoading: true});
+    await delay(3);
+    this.setState({aiLoading: false});
   };
 
   checkWinner = () => {
@@ -140,6 +158,7 @@ class App2 extends Component {
   };
 
   render() {
+    const {aiLoading} = this.state;
     return (
       <View style={Styles.container}>
         <Text
@@ -202,16 +221,25 @@ class App2 extends Component {
               {this.Icon(2, 2)}
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            onPress={() => this.resetGames()}
+          <View
             style={{
               flex: 1,
               // alignContent: 'center',
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Text>Mulai Lagi</Text>
-          </TouchableOpacity>
+            {aiLoading && (
+              <>
+                <ActivityIndicator color="grey" />
+                <Text>Ai Loading...</Text>
+              </>
+            )}
+            <TouchableOpacity
+              style={{marginTop: 10}}
+              onPress={() => this.resetGames()}>
+              <Text>Mulai Lagi</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
