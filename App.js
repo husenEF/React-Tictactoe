@@ -4,7 +4,7 @@ import {App2} from '@screens';
 const App = () => {
   return (
     <View style={{flex: 1}}>
-      <Text>Main App</Text>
+      <Text style={{textAlign: 'center', fontSize: 25}}>Tic Tac Toe Game</Text>
       <App2 />
     </View>
   );
