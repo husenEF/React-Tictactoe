@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 const delay = (t = 2) =>
-  new Promise(resolve => setTimeout(() => resolve(), t * 1000));
+  new Promise(resolve => setTimeout(resolve, t * 1000));
 class App2 extends Component {
   state = {
     gameBox: [
@@ -28,6 +28,7 @@ class App2 extends Component {
 
   resetGames = () =>
     this.setState({
+      player: 1,
       gameBox: [
         [0, 0, 0],
         [0, 0, 0],
@@ -47,13 +48,13 @@ class App2 extends Component {
 
   Icon = (r, c) => {
     //get value by posistion
-    const {gameBox} = this.state;
+    const { gameBox } = this.state;
     const value = gameBox[r][c];
     switch (value) {
       case 1:
-        return <Text style={{fontSize: 30}}>X</Text>;
+        return <Text style={{ fontSize: 30 }}>X</Text>;
       case -1:
-        return <Text style={{fontSize: 30}}>O</Text>;
+        return <Text style={{ fontSize: 30 }}>O</Text>;
       case 0:
       default:
         return null;
@@ -61,7 +62,7 @@ class App2 extends Component {
   };
 
   onBoxClick = (r, c) => {
-    const {gameBox, player} = this.state;
+    const { gameBox, player } = this.state;
     const theBoxPosition = gameBox;
     const checkValue = theBoxPosition[r][c];
     if (checkValue !== 0) {
@@ -71,44 +72,61 @@ class App2 extends Component {
     //set value by position
     theBoxPosition[r][c] = player === 1 ? 1 : -1;
     this.setState(
-      {gameBox: theBoxPosition, player: player === 1 ? 2 : 1},
+      { gameBox: theBoxPosition, player: player === 1 ? 2 : 1 },
       () => {
         const w = this.checkWinner();
-        // console.log({w});
+        console.log({ w });
         if (w === 'full') {
           Alert.alert('Draw', 'permainan Seri', [
-            {text: 'Mulai Lagi', onPress: () => this.resetGames()},
+            { text: 'Mulai Lagi', onPress: () => this.resetGames() },
           ]);
         } else if (w === 1) {
           Alert.alert('Pemain X menang', 'permainan dimenangakan pemain X', [
-            {text: 'Mulai Lagi', onPress: () => this.resetGames()},
+            { text: 'Mulai Lagi', onPress: () => this.resetGames() },
           ]);
         } else if (w === 0) {
           Alert.alert('Pemain O menang', 'permainan dimenangakan pemain O', [
-            {text: 'Mulai Lagi', onPress: () => this.resetGames()},
+            { text: 'Mulai Lagi', onPress: () => this.resetGames() },
           ]);
+        } else {
+          if (player === 1)
+            this.runAI()
         }
+
       },
     );
   };
 
-  shouldComponentUpdate(_nextProps, nextState) {
-    const {player} = nextState;
-    const {player: currentPlayer} = this.state;
-    // if (player === 2 && currentPlayer === 1) {
-    //   this.runAI();
-    // }
-    return nextState;
-  }
 
   runAI = async () => {
-    this.setState({aiLoading: true});
+    console.log("ai start")
+    this.setState({ aiLoading: true });
+    let coor = []
+    const pos = this.state.gameBox
+    for (let i = 0; i < pos.length; i++) {
+      for (let j = 0; j < pos[i].length; j++) {
+        if (pos[i][j] === 0) {
+          coor.push(`${i},${j}`);
+        }
+      }
+    }
+    console.log({ coor });
+    const randomCoor = coor[Math.floor(Math.random() * coor.length)]
+    // const randomKoor = koor[Math.floor(Math.random() * koor.length)]
+
+    // console.log({ randomCoor })
     await delay(3);
-    this.setState({aiLoading: false});
+    this.setState({ aiLoading: false });
+
+    const newPos = randomCoor.split(",")
+    // console.log({ newPos })
+    //set ai position
+    this.onBoxClick(newPos[0], newPos[1]);
+    // console.log("ai stop")
   };
 
   checkWinner = () => {
-    const {gameBox} = this.state;
+    const { gameBox } = this.state;
     let total;
 
     //check row
@@ -158,7 +176,7 @@ class App2 extends Component {
   };
 
   render() {
-    const {aiLoading} = this.state;
+    const { aiLoading } = this.state;
     return (
       <View style={Styles.container}>
         <Text
@@ -169,55 +187,64 @@ class App2 extends Component {
           }}>
           Main Yuk
         </Text>
-        <View style={{flex: 7}}>
+        <View style={{ flex: 7 }}>
           <View style={Styles.boxContainer}>
             <TouchableOpacity
-              onPress={() => this.onBoxClick(0, 0)}
-              style={[Styles.box, {borderLeftWidth: 0, borderTopWidth: 0}]}>
+
+              onPress={() => (!aiLoading) ? this.onBoxClick(0, 0) : null}
+              style={[Styles.box, { borderLeftWidth: 0, borderTopWidth: 0 }]}>
               {this.Icon(0, 0)}
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.onBoxClick(0, 1)}
-              style={[Styles.box, {borderTopWidth: 0}]}>
+
+              onPress={() => (!aiLoading) ? this.onBoxClick(0, 1) : null}
+              style={[Styles.box, { borderTopWidth: 0 }]}>
               {this.Icon(0, 1)}
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.onBoxClick(0, 2)}
-              style={[Styles.box, {borderRightWidth: 0, borderTopWidth: 0}]}>
+
+              onPress={() => (!aiLoading) ? this.onBoxClick(0, 2) : null}
+              style={[Styles.box, { borderRightWidth: 0, borderTopWidth: 0 }]}>
               {this.Icon(0, 2)}
             </TouchableOpacity>
           </View>
           <View style={Styles.boxContainer}>
             <TouchableOpacity
-              onPress={() => this.onBoxClick(1, 0)}
-              style={[Styles.box, {borderLeftWidth: 0}]}>
+
+              onPress={() => (!aiLoading) ? this.onBoxClick(1, 0) : null}
+              style={[Styles.box, { borderLeftWidth: 0 }]}>
               {this.Icon(1, 0)}
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.onBoxClick(1, 1)}
+
+              onPress={() => (!aiLoading) ? this.onBoxClick(1, 1) : null}
               style={[Styles.box]}>
               {this.Icon(1, 1)}
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.onBoxClick(1, 2)}
-              style={[Styles.box, {borderRightWidth: 0}]}>
+
+              onPress={() => (!aiLoading) ? this.onBoxClick(1, 2) : null}
+              style={[Styles.box, { borderRightWidth: 0 }]}>
               {this.Icon(1, 2)}
             </TouchableOpacity>
           </View>
           <View style={Styles.boxContainer}>
             <TouchableOpacity
-              onPress={() => this.onBoxClick(2, 0)}
-              style={[Styles.box, {borderLeftWidth: 0, borderBottomWidth: 0}]}>
+
+              onPress={() => (!aiLoading) ? this.onBoxClick(2, 0) : null}
+              style={[Styles.box, { borderLeftWidth: 0, borderBottomWidth: 0 }]}>
               {this.Icon(2, 0)}
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.onBoxClick(2, 1)}
-              style={[Styles.box, {borderBottomWidth: 0}]}>
+
+              onPress={() => (!aiLoading) ? this.onBoxClick(2, 1) : null}
+              style={[Styles.box, { borderBottomWidth: 0 }]}>
               {this.Icon(2, 1)}
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.onBoxClick(2, 2)}
-              style={[Styles.box, {borderBottomWidth: 0, borderRightWidth: 0}]}>
+
+              onPress={() => (!aiLoading) ? this.onBoxClick(2, 2) : null}
+              style={[Styles.box, { borderBottomWidth: 0, borderRightWidth: 0 }]}>
               {this.Icon(2, 2)}
             </TouchableOpacity>
           </View>
@@ -239,9 +266,9 @@ class App2 extends Component {
               onPress={() => this.resetGames()}>
               <Text>Mulai Lagi</Text>
             </TouchableOpacity>
-          </View>
         </View>
       </View>
+      </View >
     );
   }
 }
